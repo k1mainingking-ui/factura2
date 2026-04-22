@@ -87,6 +87,8 @@ async def send_ai_request(user_id: int, user_message: str) -> str:
     try:
         add_message(user_id, "user", user_message)
         
+        logger.info(f"Отправка запроса к AI: {AI_MODEL}, URL: {AI_BASE_URL}")
+        
         response = await client.chat.completions.create(
             model=AI_MODEL,
             messages=get_conversation_history(user_id),
@@ -97,22 +99,12 @@ async def send_ai_request(user_id: int, user_message: str) -> str:
         ai_response = response.choices[0].message.content.strip()
         add_message(user_id, "assistant", ai_response)
         
-        logger.info(f"Получен ответ от AI для пользователя {user_id}")
+        logger.info(f"Получен ответ от AI для пользователя {user_id}: {ai_response[:50]}...")
         return ai_response
     
-    except APIConnectionError as e:
-        logger.error(f"Ошибка подключения к AI API: {e}")
-        logger.error(f"Полная ошибка: {repr(e)}")
-        return "Извините, AI-ассистент временно недоступен. Позвоните нам: +7 (913) 917-66-49"
-    
-    except RateLimitError as e:
-        logger.error(f"Превышен лимит запросов к AI API: {e}")
-        return "Извините, сервис перегружен. Попробуйте позже или позвоните нам: +7 (913) 917-66-49"
-    
-    except APIError as e:
-        logger.error(f"Ошибка API AI: {e}")
-        return "Извините, произошла ошибка при обработке запроса. Позвоните нам: +7 (913) 917-66-49"
-    
     except Exception as e:
-        logger.error(f"Неизвестная ошибка в AI сервисе: {e}")
-        return "Извините, временные неполадки. Позвоните нам: +7 (913) 917-66-49"
+        full_error = repr(e)
+        logger.error(f"КРИТИЧЕСКАЯ ОШИБКА AI: {full_error}")
+        logger.error(f"Детали: AI_MODEL={AI_MODEL}, AI_BASE_URL={AI_BASE_URL}, API_KEY={AI_API_KEY[:10]}...")
+        
+        return f"Извините, произошла ошибка AI-ассистента: {str(e)}. Позвоните нам: +7 (913) 917-66-49"
