@@ -23,11 +23,15 @@ conversation_history: Dict[int, List[Dict[str, str]]] = {}
 MAX_HISTORY_LENGTH = 10
 
 # Инициализация OpenAI клиента
+import httpx
+
+# Инициализация OpenAI клиента с отключенной проверкой SSL
 client = AsyncOpenAI(
     api_key=AI_API_KEY,
     base_url=AI_BASE_URL,
-    timeout=30.0,
-    max_retries=2
+    timeout=60.0,
+    max_retries=3,
+    http_client=httpx.AsyncClient(verify=False)
 )
 
 def init_user_conversation(user_id: int) -> None:
@@ -85,6 +89,7 @@ async def send_ai_request(user_id: int, user_message: str) -> str:
     
     except APIConnectionError as e:
         logger.error(f"Ошибка подключения к AI API: {e}")
+        logger.error(f"Полная ошибка: {repr(e)}")
         return "Извините, AI-ассистент временно недоступен. Позвоните нам: +7 (913) 917-66-49"
     
     except RateLimitError as e:
