@@ -1,0 +1,27 @@
+# Переменные окружения с секретными ключами
+.env
+
+# Виртуальное окружение
+venv/
+venv.bat
+activate.bat
+
+# Python кэш
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Лог файлы
+*.log
+bot.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Системные файлы
+Thumbs.db
+.DS_Store
