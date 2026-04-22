@@ -180,10 +180,17 @@ async def handle_ai_message(message: Message, state: FSMContext):
         logger.info(f"Пользователь {user_id} отправил запрос к AI: {message.text[:50]}...")
         
         # Показываем что бот печатает
-        await message.chat.do("typing")
+        try:
+            await message.chat.do("typing")
+        except:
+            pass
         
-        ai_response = await send_ai_request(user_id, message.text)
-        await message.answer(ai_response)
+        try:
+            ai_response = await send_ai_request(user_id, message.text)
+            await message.answer(ai_response)
+        except Exception as e:
+            logger.error(f"КРИТИЧЕСКАЯ ОШИБКА В ИИ ОБРАБОТЧИКЕ: {repr(e)}", exc_info=True)
+            await message.answer("Извините, произошла ошибка. Попробуйте еще раз или обратитесь по телефону +7 (913) 917-66-49")
 
 @router.message(BotStates.main_menu, F.text == "ℹ️ О салоне")
 async def show_about(message: Message):
