@@ -25,7 +25,9 @@ MAX_HISTORY_LENGTH = 10
 # Инициализация OpenAI клиента
 client = AsyncOpenAI(
     api_key=AI_API_KEY,
-    base_url=AI_BASE_URL
+    base_url=AI_BASE_URL,
+    timeout=30.0,
+    max_retries=2
 )
 
 def init_user_conversation(user_id: int) -> None:
