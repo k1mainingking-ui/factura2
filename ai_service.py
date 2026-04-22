@@ -26,6 +26,9 @@ MAX_HISTORY_LENGTH = 10
 import httpx
 
 # Инициализация OpenAI клиента с отключенной проверкой SSL
+import requests
+
+# Инициализация OpenAI клиента с отключенной проверкой SSL
 client = AsyncOpenAI(
     api_key=AI_API_KEY,
     base_url=AI_BASE_URL,
@@ -33,6 +36,16 @@ client = AsyncOpenAI(
     max_retries=3,
     http_client=httpx.AsyncClient(verify=False)
 )
+
+# Проверка подключения к API
+try:
+    response = requests.get(AI_BASE_URL, timeout=10, verify=False)
+    if response.status_code == 200:
+        logger.info("✅ API доступен: " + AI_BASE_URL)
+    else:
+        logger.error(f"❌ API недоступен: {response.status_code}")
+except Exception as e:
+    logger.error(f"❌ Ошибка подключения к API: {repr(e)}")
 
 def init_user_conversation(user_id: int) -> None:
     """Инициализирует или сбрасывает историю диалога для пользователя"""
